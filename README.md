@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tiler
 
-## Getting Started
+A minimalist strategy game where you compete against an AI to capture the most territory on the board.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## About the Game
+Tiler is a turn-based puzzle game. You play as **Cyan**, and the computer plays as **Rose**.
+* **The Goal:** Own the most tiles when the board is full.
+* **How to Play:** Click an empty square to place your piece. Any enemy pieces directly adjacent to yours (up, down, left, right) will flip to your color.
+* **Strategy:** Control the corners and edges to protect your pieces from being flipped back.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
+* **Smart AI:** Plays against you using a minimax algorithm (it thinks ahead!).
+* **Themes:** Choose between Neon, Toxic, and Sunset visual styles.
+* **Customizable:** Change board size (3x3 to 7x7) and difficulty levels.
+* **Responsive:** Works great on both desktop and mobile.
+* **Offline Ready:** Runs entirely in your browser; no server required.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
+* Next.js 14
+* TypeScript
+* Tailwind CSS
+* Framer Motion
 
-## Learn More
+## How to Run
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the repo**
+    ```bash
+    git clone [https://github.com/TheSj78/tiler.git](https://github.com/TheSj78/tiler.git)
+    cd tiler
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3.  **Start the game**
+    ```bash
+    npm run dev
+    ```
 
-## Deploy on Vercel
+4.  **Open in browser**
+    Go to `http://localhost:3000`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*By Shubham Jain*
