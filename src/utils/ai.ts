@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { Board, makeMove, getScore, isGameOver } from '@/utils/gameLogic';
+import { Board, makeMove, getScore, isGameOver } from './gameLogic';
+import { Difficulty } from '@/components/SettingsModal';
 
 function evaluate(board: Board): number {
   const { human, ai } = getScore(board);
-  return ai - human; 
+  return ai - human;
 }
 
 function minimax(board: Board, depth: number, isMaximizing: boolean, includeDiagonals: boolean): number {
@@ -40,15 +40,15 @@ function minimax(board: Board, depth: number, isMaximizing: boolean, includeDiag
   }
 }
 
-export async function POST(req: Request) {
-  const { board, difficulty, includeDiagonals } = await req.json();
+export function getBestMove(board: Board, difficulty: Difficulty, includeDiagonals: boolean) {
   const size = board.length;
   
+  // -- Dynamic Difficulty Logic --
   let depth = 1;
   if (difficulty === 'medium') depth = 3;
   if (difficulty === 'hard') depth = 4;
 
-  // Safety cap for larger boards to prevent timeouts
+  // Safety cap for larger boards to prevent browser freezing
   if (size >= 6 && depth > 3) depth = 3; 
   if (size >= 7 && depth > 2) depth = 2; 
 
@@ -69,5 +69,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ move: bestMove });
+  return bestMove;
 }

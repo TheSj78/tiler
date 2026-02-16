@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, RefreshCw, Trophy } from 'lucide-react';
 import { getInitialBoard, makeMove, getScore, isGameOver, Board } from '@/utils/gameLogic';
 import { GameSettings, THEMES } from './SettingsModal';
+import { getBestMove } from '@/utils/ai'; // Import the new local AI
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,7 +21,6 @@ export default function GameBoard({ settings }: GameBoardProps) {
   const processingRef = useRef(false);
   const theme = THEMES[settings.theme];
 
-  // Initialize Game Logic
   useEffect(() => {
     resetGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -31,23 +31,16 @@ export default function GameBoard({ settings }: GameBoardProps) {
     processingRef.current = true;
     setLoading(true);
 
-    try {
-        const [res] = await Promise.all([
-          fetch('/api/ai', {
-            method: 'POST',
-            body: JSON.stringify({ 
-                board: currentBoard, 
-                difficulty: settings.difficulty,
-                includeDiagonals: settings.includeDiagonals 
-            }),
-          }),
-          sleep(600) // Reduced slightly for snappier mobile feel
-        ]);
+    // Small timeout to allow UI to render "Thinking..." state before heavy calculation runs
+    await sleep(500);
 
-        const data = await res.json();
+    try {
+        // --- LOCAL AI CALCULATION ---
+        // No fetch/API anymore. It runs right here in the browser.
+        const bestMove = getBestMove(currentBoard, settings.difficulty, settings.includeDiagonals);
         
-        if (data.move) {
-            const aiBoard = makeMove(currentBoard, data.move.r, data.move.c, 'ai', settings.includeDiagonals);
+        if (bestMove) {
+            const aiBoard = makeMove(currentBoard, bestMove.r, bestMove.c, 'ai', settings.includeDiagonals);
             setBoard(aiBoard);
             setIsPlayerTurn(true);
             if (isGameOver(aiBoard)) endGame(aiBoard);
@@ -93,7 +86,6 @@ export default function GameBoard({ settings }: GameBoardProps) {
     setIsPlayerTurn(!aiGoesFirst);
 
     if (aiGoesFirst) {
-        // We must manually trigger this because useEffect won't fire if settings haven't changed
         triggerAIMove(freshBoard);
     }
   };
@@ -102,7 +94,6 @@ export default function GameBoard({ settings }: GameBoardProps) {
   const isSmallBoard = settings.boardSize <= 4;
   const isLargeBoard = settings.boardSize >= 6;
 
-  // --- RESPONSIVE TILE SIZING ---
   const getTileSize = () => {
     if (isLargeBoard) return 'w-8 h-8 md:w-10 md:h-10 text-xs'; 
     return 'w-10 h-10 md:w-14 md:h-14 text-sm';
@@ -111,7 +102,7 @@ export default function GameBoard({ settings }: GameBoardProps) {
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto p-6 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 shadow-xl relative transition-all duration-300">
        
-       {/* 1. TOP HEADER: Scores and Status */}
+       {/* 1. TOP HEADER */}
        <div className="flex items-center justify-between w-full">
           <div className="flex flex-col items-center">
              <span className="text-[10px] md:text-xs text-gray-400 mb-1 font-bold tracking-wider">YOU</span>
@@ -127,7 +118,6 @@ export default function GameBoard({ settings }: GameBoardProps) {
                    <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" /> Thinking...
                 </div>
              ) : !winner ? (
-                // LOGIC FIX: Check isPlayerTurn to ensure we don't show "Your Turn" when waiting for AI trigger
                 <div className={`font-bold text-xs md:text-sm tracking-widest uppercase ${isPlayerTurn ? 'text-white' : 'text-gray-500'}`}>
                     {isPlayerTurn ? "Your Turn" : "Waiting..."}
                 </div>
